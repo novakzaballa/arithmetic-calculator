@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -6,13 +6,47 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
-import {Link} from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 
 const theme = createTheme();
 
-export default function LogIn(props: any) {
-  const { login } = useAuth();
+export default function LogIn() {
+  const { login, user } = useAuth();
+  const [mail, setMail]  = useState('');
+  const [password, setPassword]  = useState('');
+  const [buttonDisabled, setButtonDisabled]  = useState(true);
+
+  useEffect(() => {
+    const validate = validateMail(mail);
+    if(validate && password){
+      setButtonDisabled(false)
+    } else {
+      setButtonDisabled(true)
+    }
+  }, [mail, password]);
+
+  /*const buttonValidator = (mail: string) => {
+    const validate = validateMail(mail)
+    setMail(mail);
+    if(validate){
+      setButtonDisabled(false)
+    } else {
+      setButtonDisabled(true)
+    }
+  }*/
+
+  const validateMail = (mail: string) => {
+    return String(mail)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
+  if (user) {
+    return <Navigate to="/calculator/operations" />;
+  }
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -47,6 +81,10 @@ export default function LogIn(props: any) {
               name="email"
               autoComplete="email"
               autoFocus
+              value={mail}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setMail(event.target.value)
+              }}
             />
             <TextField
               margin="normal"
@@ -57,10 +95,15 @@ export default function LogIn(props: any) {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={password}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPassword(event.target.value)
+              }}
             />
               <Button
                 type="submit"
                 fullWidth
+                disabled={buttonDisabled}
                 variant="contained"
                 sx={{mt: 3, mb: 2}}
               >

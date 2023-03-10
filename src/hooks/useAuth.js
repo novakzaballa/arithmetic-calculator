@@ -13,6 +13,11 @@ export const AuthProvider = ({ children }: any) => {
     navigate("/calculator/operations", { replace: true });
   };
 
+  /*const fakeAuth = (data: any) => {
+    new Promise((resolve) => {
+      (setTimeout(() => resolve('2342f2f1d131rf12'), 250));
+    })
+  }*/
   const logout = () => {
     setUser(null);
     navigate("/", { replace: true });
