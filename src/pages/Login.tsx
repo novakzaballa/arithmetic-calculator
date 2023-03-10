@@ -7,16 +7,18 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {Link} from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 const theme = createTheme();
 
-export default function LogIn() {
+export default function LogIn(props: any) {
+  const { login } = useAuth();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    login({
+      email: data.get("email"),
+      password: data.get("password")
     });
   };
 
@@ -56,7 +58,6 @@ export default function LogIn() {
               id="password"
               autoComplete="current-password"
             />
-            <Link to="/Data">
               <Button
                 type="submit"
                 fullWidth
@@ -65,7 +66,6 @@ export default function LogIn() {
               >
                 LOGIN
               </Button>
-            </Link>
           </Box>
         </Box>
       </Container>

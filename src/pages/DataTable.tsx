@@ -228,7 +228,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             <DeleteIcon />
           </IconButton>
         </Tooltip>}
-        <Button variant="contained">LogOut</Button>
     </Toolbar>
   );
 }
