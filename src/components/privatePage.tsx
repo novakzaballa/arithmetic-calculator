@@ -3,10 +3,10 @@ import { useAuth } from "../hooks/useAuth";
 import { Bar } from "./Bar";
 
 export const PrivatePage = () => {
-  const { user } = useAuth();
+  const { token } = useAuth();
   const outlet = useOutlet();
 
-  if (!user) {
+  if (!token) {
     return <Navigate to="/" />;
   }
 

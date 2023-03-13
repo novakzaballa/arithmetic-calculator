@@ -55,6 +55,8 @@ const rows = [
   createData('9fj29jns','square root', 437, '2023/05/21'),
 ];
 
+console.log('DEBUG rows:', rows)
+
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
     return -1;

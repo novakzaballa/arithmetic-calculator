@@ -7,9 +7,7 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
-
 import Button from "@mui/material/Button";
-
 import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
@@ -17,7 +15,7 @@ import { useAuth } from "../hooks/useAuth";
 export const Bar = ({ pages }: any) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { token, logout } = useAuth();
 
   const handleOpenNavMenu = (event: any) => {
     setAnchorElNav(event.currentTarget);
@@ -80,7 +78,7 @@ export const Bar = ({ pages }: any) => {
                   <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
               ))}
-              {!!user && (
+              {!!token && (
                 <MenuItem key={"logout"} onClick={logout}>
                   <Typography textAlign="center">Logout</Typography>
                 </MenuItem>
@@ -105,7 +103,7 @@ export const Bar = ({ pages }: any) => {
                 {page.label}
               </Button>
             ))}
-            {!!user && (
+            {!!token && (
               <Button
                 key={"logout"}
                 onClick={logout}

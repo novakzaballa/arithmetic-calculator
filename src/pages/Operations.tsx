@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import axios from "axios";
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,7 +14,6 @@ import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
-
 
 const theme = createTheme();
 
@@ -37,14 +37,14 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         }),
       }}
     >
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Balance: {remainingMoney}
-        </Typography>
+      <Typography
+        sx={{ flex: '1 1 100%' }}
+        variant="h6"
+        id="tableTitle"
+        component="div"
+      >
+        Balance: {remainingMoney}
+      </Typography>
     </Toolbar>
   );
 }
@@ -55,28 +55,42 @@ export default function Operations() {
   const [type, setType] = useState('');
   const [remainingMoney, setRemainingMoney] = useState(90);
   const [buttonDisabled, setButtonDisabled]  = useState(true);
-  const [number1, setNumber1] = useState(NaN);
-  const [number2, setNumber2] = useState(NaN);
+  const [operand1, setOperand1] = useState(NaN);
+  const [operand2, setOperand2] = useState(NaN);
   const [openAlert, setOpenAlert] = useState(false);
+  const [result, setResult] = useState(NaN);
 
   useEffect(() => {
-    if((number1 && number2 && type) || (number1 && type !== 'square_root')) {
+    if(operand1 && operand2 && type){
+      setButtonDisabled(false)
+    } else if (operand1 && (type === 'square_root' )) {
       setButtonDisabled(false)
     } else {
       setButtonDisabled(true)
     }
-  }, [number1, number2, type]);
+  }, [operand1, operand2, type]);
 
   const setTypeAndOneItem = (type: string, oneItem: boolean) => {
     setType(type);
     setOneItem(oneItem);
   }
-  const calculateResult = () => {
+  const calculateResult = (type: string, parameters: object) => {
     const cost = 10;
     if(remainingMoney < cost ) {
       setOpenAlert(true)
+    } else {
+      axios.post('http://localhost:3000/perform_operation',
+      {
+        "operation": type,
+        "arguments": parameters
+      },
+      ).then((response) => {
+        console.log(response);
+        setResult(response.data.result)
+      }).catch((e) => {
+        console.log(e);
+      });
     }
-
   }
 
   return (
@@ -165,12 +179,12 @@ export default function Operations() {
                 required
                 fullWidth
                 label="number 1"
-                name="number1"
-                autoComplete="number1"
+                name="operand1"
+                autoComplete="operand1"
                 autoFocus
-                value={number1}
+                value={operand1}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setNumber1(parseInt(event.target.value))
+                  setOperand1(parseInt(event.target.value))
                 }}
               />
               { !oneItem &&
@@ -180,11 +194,11 @@ export default function Operations() {
                   required
                   fullWidth
                   label="number 2"
-                  name="number2"
-                  autoComplete="number2"
-                  value={number2}
+                  name="operand2"
+                  autoComplete="operand2"
+                  value={operand2}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setNumber2(parseInt(event.target.value))
+                    setOperand2(parseInt(event.target.value))
                   }}
                 />
               }
@@ -212,10 +226,18 @@ export default function Operations() {
                 fullWidth
                 variant="contained"
                 disabled={buttonDisabled}
-                onClick={() => {calculateResult()}}
+                onClick={() => {type === 'square_root' ? calculateResult(type, {operand1}): calculateResult(type, {operand1, operand2})}}
               >
                 Result
               </Button>
+              {!isNaN(result) &&<Typography
+                sx={{ flex: '1 1 100%' }}
+                variant="h6"
+                id="tableTitle"
+                component="div"
+              >
+                {result}
+              </Typography>}
             </Box>
           </Box>
         </Container>

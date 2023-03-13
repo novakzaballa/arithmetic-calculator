@@ -12,7 +12,7 @@ import { Navigate } from 'react-router-dom';
 const theme = createTheme();
 
 export default function LogIn() {
-  const { login, user } = useAuth();
+  const { login, token } = useAuth();
   const [mail, setMail]  = useState('');
   const [password, setPassword]  = useState('');
   const [buttonDisabled, setButtonDisabled]  = useState(true);
@@ -26,16 +26,6 @@ export default function LogIn() {
     }
   }, [mail, password]);
 
-  /*const buttonValidator = (mail: string) => {
-    const validate = validateMail(mail)
-    setMail(mail);
-    if(validate){
-      setButtonDisabled(false)
-    } else {
-      setButtonDisabled(true)
-    }
-  }*/
-
   const validateMail = (mail: string) => {
     return String(mail)
       .toLowerCase()
@@ -44,14 +34,14 @@ export default function LogIn() {
       );
   };
 
-  if (user) {
+  if (token) {
     return <Navigate to="/calculator/operations" />;
   }
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     login({
-      email: data.get("email"),
+      username: data.get("email"),
       password: data.get("password")
     });
   };
@@ -103,7 +93,7 @@ export default function LogIn() {
               <Button
                 type="submit"
                 fullWidth
-                disabled={buttonDisabled}
+                // disabled={buttonDisabled}
                 variant="contained"
                 sx={{mt: 3, mb: 2}}
               >
