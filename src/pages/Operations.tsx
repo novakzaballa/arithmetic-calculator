@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
+import { useAuth } from '../hooks/useAuth';
 
 const theme = createTheme();
 
@@ -50,6 +51,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 
 export default function Operations() {
+  const { token } = useAuth();
 
   const [oneItem, setOneItem] = useState(false);
   const [type, setType] = useState('');
@@ -75,6 +77,7 @@ export default function Operations() {
     setOneItem(oneItem);
   }
   const calculateResult = (type: string, parameters: object) => {
+    setOpenAlert(false);
     const cost = 10;
     if(remainingMoney < cost ) {
       setOpenAlert(true)
@@ -84,10 +87,14 @@ export default function Operations() {
         "operation": type,
         "arguments": parameters
       },
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      },
       ).then((response) => {
         console.log(response);
         setResult(response.data.result)
       }).catch((e) => {
+        setOpenAlert(true);
         console.log(e);
       });
     }
