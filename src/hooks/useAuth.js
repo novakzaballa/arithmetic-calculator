@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }: any) => {
   const navigate = useNavigate();
 
   const login = async (data: any) => {
-    axios.post('http://localhost:3000/auth',{
+    axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/auth',{
       "username": data.username,
       "password": data.password
   })

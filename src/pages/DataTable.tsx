@@ -21,11 +21,12 @@ import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import axios from 'axios';
+import { useAuth } from '../hooks/useAuth';
 
 interface Data {
   key: string;
-  type: string;
-  amount: number;
+  operation_id: string;
   balance: number;
   operation_response: number;
   date: string;
@@ -74,33 +75,33 @@ interface HeadCell {
   id: keyof Data;
   label: string;
   numeric: boolean;
+  sort: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
   {
-    id: 'type',
+    id: 'date',
     numeric: false,
-    label: 'Arithmetic operation',
+    label: 'Date',
+    sort: true
   },
   {
-    id: 'amount',
-    numeric: true,
-    label: 'Amount',
+    id: 'operation_id',
+    numeric: false,
+    label: 'Arithmetic operation',
+    sort: true
   },
   {
     id: 'balance',
     numeric: true,
-    label: 'balance',
+    label: 'Balance',
+    sort: true
   },
   {
     id: 'operation_response',
     numeric: true,
     label: 'Result',
-  },
-  {
-    id: 'date',
-    numeric: true,
-    label: 'date',
+    sort: false
   },
 ];
 
@@ -114,6 +115,8 @@ interface EnhancedTableProps {
   order: Order;
   orderBy: string;
   rowCount: number;
+  setRecordRows: any;
+  token: string;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
@@ -124,11 +127,30 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     numSelected,
     rowCount,
     onRequestSort,
+    setRecordRows,
+    token
   } = props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
+
+  const sortBy = (operation_id: string, pageNumber: number, rowsPerPage: number) => {
+    axios.get('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations',
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page_number: pageNumber || 1,
+        rows_per_page: rowsPerPage || 10
+      },
+    },
+    ).then((response) => {
+      console.log(response);
+      setRecordRows(response.data.result)
+    }).catch((e) => {
+      console.log(e);
+    });
+  }
 
   return (
     <TableHead>
@@ -148,18 +170,22 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             padding={'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+            {
+              headCell.sort ?
+                <TableSortLabel
+                  active={orderBy === headCell.id}
+                  direction={orderBy === headCell.id ? order : 'asc'}
+                  onClick={() => sortBy(headCell.id, 1, 10)}
+                >
+                  {headCell.label}
+                  {orderBy === headCell.id ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                    </Box>
+                  ) : null}
+                </TableSortLabel> :
+                  headCell.label
+            }
           </TableCell>
         ))}
       </TableRow>
@@ -171,9 +197,11 @@ interface EnhancedTableToolbarProps {
   numSelected: number;
   handleFilterValue: any;
   filterValue: string;
+ // filerList: Array<Data>;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
+  // const { numSelected, handleFilterValue, filterValue } = props;
   const { numSelected, handleFilterValue, filterValue } = props;
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -246,7 +274,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             label="operation"
             onChange={handleChange}
           >
-            <MenuItem value="">
+            <MenuItem value={''}>
               <em>None</em>
             </MenuItem>
             <MenuItem value={'addition'}>Addition</MenuItem>
@@ -263,7 +291,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
 export default function DataTable() {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('type');
+  const [orderBy, setOrderBy] = React.useState<keyof Data>('operation_id');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -271,109 +299,98 @@ export default function DataTable() {
   const [recordRows, setRecordRows] = React.useState([
     {
         "key": "asder22",
-        "type": "addition",
-        "amount": 305,
+        "operation_id": "addition",
         "balance": 50,
         "operation_response": 3,
         "date": "2023/05/04"
     },
     {
         "key": "39djdjia",
-        "type": "subtraction",
-        "amount": 452,
+        "operation_id": "subtraction",
         "balance": 43,
         "operation_response": 4,
         "date": "2023/05/05"
     },
     {
         "key": "aosd993",
-        "type": "multiplication",
-        "amount": 262,
+        "operation_id": "multiplication",
         "balance": 89,
         "operation_response": 8,
         "date": "2023/05/05"
     },
     {
         "key": "dno29aiis",
-        "type": "division",
-        "amount": 159,
+        "operation_id": "division",
         "balance": 54,
         "operation_response": 4,
         "date": "2023/05/06"
     },
     {
         "key": "e83ujnda",
-        "type": "addition",
-        "amount": 356,
+        "operation_id": "addition",
         "balance": 89,
         "operation_response": 45,
         "date": "2023/05/08"
     },
     {
         "key": "asd82uhn",
-        "type": "division",
-        "amount": 408,
+        "operation_id": "division",
         "balance": 47,
         "operation_response": 4,
         "date": "2023/05/08"
     },
     {
         "key": "mei82hi10",
-        "type": "square root",
-        "amount": 237,
+        "operation_id": "square root",
         "balance": 29,
         "operation_response": 222,
         "date": "2023/05/08"
     },
     {
         "key": "3innakq",
-        "type": "subtraction",
-        "amount": 12,
+        "operation_id": "subtraction",
         "balance": 375,
         "operation_response": 48,
         "date": "2023/05/09"
     },
     {
         "key": "1emmamwm4",
-        "type": "addition",
-        "amount": 518,
+        "operation_id": "addition",
         "balance": 68,
         "operation_response": 89,
         "date": "2023/05/13"
     },
     {
         "key": "so9jj3jjc",
-        "type": "random string generation",
-        "amount": 392,
+        "operation_id": "random string generation",
         "balance": 90,
         "operation_response": 74,
         "date": "2023/05/14"
     },
     {
         "key": "demve23r5",
-        "type": "subtraction",
-        "amount": 318,
+        "operation_id": "subtraction",
         "balance": 93,
         "operation_response": 67,
         "date": "2023/05/14"
     },
     {
         "key": "r4tmsk201",
-        "type": "random string generation",
-        "amount": 360,
+        "operation_id": "random string generation",
         "balance": 23,
         "operation_response": 3,
         "date": "2023/05/15"
     },
     {
         "key": "9fj29jns",
-        "type": "square root",
-        "amount": 437,
+        "operation_id": "square root",
         "balance": 488,
         "operation_response": 44,
         "date": "2023/05/21"
     }
   ]);
+
+  const { token } = useAuth();
 
   const handleFilterValue = (text: string) => {
     setFilterValue(text)
@@ -388,14 +405,6 @@ export default function DataTable() {
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = recordRows.map((n) => n.type);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
 
   const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
     const selectedIndex = selected.indexOf(name);
@@ -438,15 +447,24 @@ export default function DataTable() {
   let result = test;
 
   if(filterValue){
-    result = recordRows.filter(word => word.type === filterValue);
+    result = recordRows.filter(word => word.operation_id === filterValue);
     result = stableSort(result, getComparator(order, orderBy))
     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
   }
 
+  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelected = recordRows.map((n) => n.operation_id);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
+  };
+
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} handleFilterValue={handleFilterValue} filterValue={filterValue}/>
+        <EnhancedTableToolbar numSelected={selected.length} handleFilterValue={handleFilterValue} filterValue={filterValue} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -460,17 +478,18 @@ export default function DataTable() {
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={recordRows.length}
+              setRecordRows={setRecordRows}
+              token={token}
             />
             <TableBody>
               {result
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.type);
+                  const isItemSelected = isSelected(row.key);
                   const labelId = `enhanced-table-checkbox-${index}`;
-
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.type)}
+                      onClick={(event) => handleClick(event, row.key)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
@@ -486,18 +505,17 @@ export default function DataTable() {
                           }}
                         />
                       </TableCell>
+                      <TableCell align="left">{row.date}</TableCell>
                       <TableCell
                         component="th"
                         id={labelId}
                         scope="row"
                         padding="none"
                       >
-                        {row.type}
+                        {row.operation_id}
                       </TableCell>
-                      <TableCell align="right">{row.amount}</TableCell>
                       <TableCell align="right">{row.balance}</TableCell>
                       <TableCell align="right">{row.operation_response}</TableCell>
-                      <TableCell align="right">{row.date}</TableCell>
                     </TableRow>
                   );
                 })}

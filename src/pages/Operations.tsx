@@ -65,7 +65,7 @@ export default function Operations() {
   useEffect(() => {
     if(operand1 && operand2 && type){
       setButtonDisabled(false)
-    } else if (operand1 && (type === 'square_root' )) {
+    } else if (operand1 && (type === 'square_root')) {
       setButtonDisabled(false)
     } else {
       setButtonDisabled(true)
@@ -82,7 +82,7 @@ export default function Operations() {
     if(remainingMoney < cost ) {
       setOpenAlert(true)
     } else {
-      axios.post('http://localhost:3000/perform_operation',
+      axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations/perform_operation',
       {
         "operation": type,
         "arguments": parameters
@@ -237,14 +237,16 @@ export default function Operations() {
               >
                 Result
               </Button>
-              {!isNaN(result) &&<Typography
+              {!isNaN(result) && <TextField fullWidth disabled label="Result" value={result} sx={{mt:2}}/>}
+              
+              {/*!isNaN(result) &&<Typography
                 sx={{ flex: '1 1 100%' }}
                 variant="h6"
                 id="tableTitle"
                 component="div"
               >
                 {result}
-              </Typography>}
+                </Typography>*/}
             </Box>
           </Box>
         </Container>
