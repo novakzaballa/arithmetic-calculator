@@ -15,7 +15,8 @@ export const AuthProvider = ({ children }: any) => {
       "password": data.password
   })
     .then(function (response) {
-      setToken(response.data.token);
+      console.log('DEBUG: response', response);
+      setToken(response.data.payload.token);
     })
     .catch(function (error) {
       console.log(error);

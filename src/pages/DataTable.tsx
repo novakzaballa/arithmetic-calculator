@@ -12,8 +12,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { visuallyHidden } from '@mui/utils';
 import MenuItem from '@mui/material/MenuItem';
@@ -80,10 +78,7 @@ const headCells: readonly HeadCell[] = [
 ];
 
 interface EnhancedTableProps {
-  onRequestSort: (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data
-  ) => void;
+  setOrder: any
   order: Order;
   orderBy: string;
   rowCount: number;
@@ -95,14 +90,17 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     order,
     orderBy,
     rowCount,
-    onRequestSort,
+    setOrder,
     sortBy
   } = props;
   // console.log('DEBUG: order:', order);
-  const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
-    console.log('event:', event)
-    onRequestSort(event, property);
-  };
+  // console.log('DEBUG: orderBy:', orderBy);
+
+  const setOrderHandler = (order: string, operationId: string) =>{
+    const or = order === 'asc' ? 'desc' : 'asc'
+    setOrder(or)
+    sortBy({sort_by : operationId, page_number: 1, rows_per_page : 10, sort_type: order})
+  }
   return (
     <TableHead>
       <TableRow>
@@ -117,9 +115,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
               headCell.sort ?
                 <TableSortLabel
                   active={orderBy === headCell.id}
-                  direction={orderBy === headCell.id ? order : 'asc'}
+                  direction={order}
                   onClick={() => (
-                    sortBy({sort_by : headCell.id, page_number: 1, rows_per_page : 10}) && createSortHandler
+                    setOrderHandler(order, headCell.id)
                   )}
                 >
                   {headCell.label}
@@ -202,7 +200,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 export default function DataTable() {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('operation_id');
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterValue, setFilterValue] = React.useState('');
@@ -217,9 +214,10 @@ export default function DataTable() {
       params
     },
     ).then((response) => {
-      // console.log(response);
-      setRecordRows(response.data.result)
-      setTotalRecord(response.data.count)
+      console.log(response);
+      setRecordRows(response.data.payload.result)
+      setTotalRecord(response.data.payload.count)
+
     }).catch((e) => {
       console.log(e);
     });
@@ -235,18 +233,28 @@ export default function DataTable() {
     setFilterValue(text)
   }
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    console.log('DEBUG: isAsc:', isAsc);
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+  const handleRequestSort = () => {
+    setOrder(order === 'asc' ? 'asc' : 'desc');
+    //setOrderBy(property);
   };
 
+  const deleteRecord = (operation_id: string) => {
+    axios.delete(`https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations/${operation_id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+    ).then((response) => {
+      console.log(response);
+      sortBy({page_number: 1, rows_per_page : 10})
+    }).catch((e) => {
+      console.log(e);
+    });
+
+  };
+
+
   const handleChangePage = (event: unknown, newPage: number) => {
-    sortBy({page_number: newPage + 1 , rows_per_page: rowsPerPage})
+    sortBy({page_number: newPage + 1 , rows_per_page: rowsPerPage, sort_type: order})
     setPage(newPage);
   };
 
@@ -271,7 +279,7 @@ export default function DataTable() {
             <EnhancedTableHead
               order={order}
               orderBy={orderBy}
-              onRequestSort={handleRequestSort}
+              setOrder={setOrder}
               rowCount={recordRows.length}
               sortBy={sortBy}
             />
@@ -293,11 +301,11 @@ export default function DataTable() {
                         scope="row"
                         padding="none"
                       >
-                        {row.operation_id}
+                        {row.operation_id.substring(10)}
                       </TableCell>
                       <TableCell align="right">{row.user_balance}</TableCell>
                       <TableCell align="right">{row.operation_response}</TableCell>
-                      <TableCell align="right"><Button> Delete </Button></TableCell>
+                      <TableCell align="right"><Button onClick={() => deleteRecord(row.id.toString())}> <DeleteIcon sx={{color: 'red'}}/> </Button></TableCell>
                     </TableRow>
                   );
                 })}

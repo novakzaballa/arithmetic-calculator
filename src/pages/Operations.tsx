@@ -82,7 +82,7 @@ export default function Operations() {
     if(remainingMoney < cost ) {
       setOpenAlert(true)
     } else {
-      axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations/perform_operation',
+      axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations',
       {
         "operation": type,
         "arguments": parameters
@@ -92,7 +92,7 @@ export default function Operations() {
       },
       ).then((response) => {
         console.log(response);
-        setResult(response.data.result)
+        setResult(response.data.payload.result)
       }).catch((e) => {
         setOpenAlert(true);
         console.log(e);
