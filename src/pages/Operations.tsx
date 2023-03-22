@@ -163,7 +163,7 @@ export default function Operations() {
                 <Button
                   fullWidth
                   variant="contained"
-                  onClick={()=>{setTypeAndOneItem('random_string', false)}}
+                  onClick={()=>{setTypeAndOneItem('random_string', true)}}
                   sx={{background: type === 'random_string' ? 'green' : 'primary'}}
                 >
                   RND
@@ -233,7 +233,7 @@ export default function Operations() {
                 fullWidth
                 variant="contained"
                 disabled={buttonDisabled}
-                onClick={() => {type === 'square_root' ? calculateResult(type, {operand1}): calculateResult(type, {operand1, operand2})}}
+                onClick={() => {type === 'square_root' ? calculateResult(type, {operand1}): type === 'random_string' ? calculateResult(type, {length: operand1}): calculateResult(type, {operand1, operand2})}}
               >
                 Result
               </Button>
