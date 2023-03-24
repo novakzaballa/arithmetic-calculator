@@ -42,16 +42,13 @@ interface HeadCell {
   sort: boolean;
 }
 
-interface sortBy {
-  operation_id: string;
-  page_number: number;
-  rows_per_page: number;
-  sort_by: string;
-  sort_type: string;
-}
-interface Params {
-  params: Array<sortBy>
-}
+// interface sortBy {
+//   operation_id: string;
+//   page_number: number;
+//   rows_per_page: number;
+//   sort_by: string;
+//   sort_type: string;
+// }
 
 const headCells: readonly HeadCell[] = [
   {
@@ -84,21 +81,26 @@ interface EnhancedTableProps {
   setOrder: any
   order: Order;
   orderBy: string;
+  rowsPerPage: number;
   sortBy: any;
+  setOrderBy: any;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
   const {
     order,
     orderBy,
+    rowsPerPage,
     setOrder,
-    sortBy
+    sortBy,
+    setOrderBy,
   } = props;
 
   const setOrderHandler = (order: string, operationId: string) =>{
     const or = order === 'asc' ? 'desc' : 'asc'
     setOrder(or)
-    sortBy({sort_by : operationId, page_number: 1, rows_per_page : 10, sort_type: order, show_deleted: true})
+    sortBy({sort_by : operationId, page_number: 1, rows_per_page : rowsPerPage, sort_type: order})
+    setOrderBy(operationId)
   }
   return (
     <TableHead>
@@ -142,7 +144,6 @@ interface EnhancedTableToolbarProps {
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  // const { numSelected, handleFilterValue, filterValue } = props;
   const { handleFilterValue, handleSwitch, filterValue } = props;
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -191,12 +192,12 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           <MenuItem value={''}>
             <em>None</em>
           </MenuItem>
-          <MenuItem value={'addition'}>Addition</MenuItem>
-          <MenuItem value={'subtraction'}>Subtraction</MenuItem>
-          <MenuItem value={'multiplication'}>Multiplication</MenuItem>
-          <MenuItem value={'division'}>Division</MenuItem>
-          <MenuItem value={'square root'}>Square Root</MenuItem>
-          <MenuItem value={'random string generation'}>Random string generation</MenuItem>
+          <MenuItem value={'OPERATION#addition'}>Addition</MenuItem>
+          <MenuItem value={'OPERATION#subtraction'}>Subtraction</MenuItem>
+          <MenuItem value={'OPERATION#multiplication'}>Multiplication</MenuItem>
+          <MenuItem value={'OPERATION#division'}>Division</MenuItem>
+          <MenuItem value={'OPERATION#square_root'}>Square Root</MenuItem>
+          <MenuItem value={'OPERATION#random_string'}>Random string generation</MenuItem>
         </Select>
       </FormControl>
     </Toolbar>
@@ -205,16 +206,15 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
 export default function DataTable() {
   const [order, setOrder] = React.useState<Order>('desc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('operation_id');
+  const [orderBy, setOrderBy] = React.useState<keyof Data>('date');
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterValue, setFilterValue] = React.useState('');
   const [recordRows, setRecordRows] = React.useState([]);
   const [totalRecord, setTotalRecord] = React.useState(0);
-  const [showDeleted, setShowDeleted] = React.useState(false)
+  const [showDeleted, setShowDeleted] = React.useState(false);
 
   const sortBy = (params: any) => {
-    // console.log('Params:', params);
     axios.get('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations',
     {
       headers: { Authorization: `Bearer ${token}` },
@@ -227,26 +227,23 @@ export default function DataTable() {
 
     }).catch((e) => {
       console.log(e);
+      if(e.response.status === 401){
+        logout();
+      }
     });
   }
 
   useEffect(() => {
-    sortBy({page_number: 1, rows_per_page : 10, show_deleted: true})
+    sortBy({page_number: 1, rows_per_page : 10})
   }, []);
 
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
 
   const handleFilterValue = (opetration_id: string) => {
-    
     setFilterValue(opetration_id)
-    // sortBy({page_number: 1, rows_per_page : rowsPerPage, operation_id: opetration_id})
-    console.log('DEBUG: text:', opetration_id)
+    sortBy({page_number: 1, rows_per_page : rowsPerPage, operation_id: opetration_id})
   }
 
-  // const handleRequestSort = () => {
-  //   setOrder(order === 'asc' ? 'asc' : 'desc');
-  //   //setOrderBy(property);
-  // };
 
   const deleteRecord = (operation_id: string) => {
     axios.delete(`https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations/${operation_id}`,
@@ -255,27 +252,30 @@ export default function DataTable() {
     },
     ).then((response) => {
       console.log(response);
-      sortBy({page_number: 1, rows_per_page : 10, show_deleted: true})
+      sortBy({page_number: 1, rows_per_page : 10})
     }).catch((e) => {
-      console.log(e);
+      console.log(e.response.status);
+      if(e.response.status === 401){
+        logout();
+      }
     });
 
   };
   const handleSwitch = (showDeleted: boolean) => {
     console.log('DEBUG: show', showDeleted);
+    sortBy({page_number: 1 , rows_per_page: rowsPerPage, sort_type: order,  show_deleted: showDeleted})
     setShowDeleted(showDeleted)
-    
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
-    sortBy({page_number: newPage + 1 , rows_per_page: rowsPerPage, sort_type: order, show_deleted: true})
+    sortBy({page_number: newPage + 1 , rows_per_page: rowsPerPage, sort_type: order})
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    sortBy({page_number:1, rows_per_page: event.target.value, show_deleted: true})
+    sortBy({page_number:1, rows_per_page: event.target.value})
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -293,14 +293,15 @@ export default function DataTable() {
             <EnhancedTableHead
               order={order}
               orderBy={orderBy}
+              rowsPerPage={rowsPerPage}
               setOrder={setOrder}
+              setOrderBy={setOrderBy}
               sortBy={sortBy}
             />
             <TableBody>
               {recordRows
                 .map((row: Data, index: number) => {
                   const labelId = `enhanced-table-checkbox-${index}`;
-                  
                   return (
                     <>
                     {row.deleted === true && showDeleted ?
@@ -324,9 +325,9 @@ export default function DataTable() {
                         </TableCell>
                         <TableCell align="right">{row.user_balance}</TableCell>
                         <TableCell align="right">{row.operation_response}</TableCell>
-                        <TableCell align="right"><Button onClick={() => deleteRecord(row.id.toString())}> <DeleteIcon sx={{color: 'red'}}/> </Button></TableCell>
+                        <TableCell align="right">{'Deleted'}</TableCell>
                       </TableRow>
-                      : 
+                      :
                       <TableRow
                       hover
                       role="checkbox"
@@ -347,9 +348,8 @@ export default function DataTable() {
                       </TableCell>
                       <TableCell align="right">{row.user_balance}</TableCell>
                       <TableCell align="right">{row.operation_response}</TableCell>
-                      <TableCell align="right"><Button onClick={() => deleteRecord(row.id.toString())}> <DeleteIcon sx={{color: 'red'}}/> </Button></TableCell>
-                    </TableRow>
-                    }
+                      <TableCell align="right">{row.deleted === true ? <Typography>{'Deleted'}</Typography> : <Button onClick={() => deleteRecord(row.id.toString())}> <DeleteIcon sx={{color: 'red'}}/> </Button> }</TableCell>
+                    </TableRow>}
                     </>
                 );
                 })}

@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }: any) => {
     axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/auth',{
       "username": data.username,
       "password": data.password
-  })
+    })
     .then(function (response) {
       console.log('DEBUG: response', response);
       setToken(response.data.payload.token);
@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }: any) => {
     .catch(function (error) {
       console.log(error);
     });
-
   };
 
   const logout = () => {

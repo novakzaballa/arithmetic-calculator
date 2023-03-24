@@ -15,6 +15,7 @@ import Toolbar from '@mui/material/Toolbar';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
 import { useAuth } from '../hooks/useAuth';
+import axiosRetry from 'axios-retry';
 
 const theme = createTheme();
 
@@ -51,7 +52,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 
 export default function Operations() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
 
   const [oneItem, setOneItem] = useState(false);
   const [type, setType] = useState('');
@@ -78,26 +79,35 @@ export default function Operations() {
   }
   const calculateResult = (type: string, parameters: object) => {
     setOpenAlert(false);
-    const cost = 10;
-    if(remainingMoney < cost ) {
-      setOpenAlert(true)
-    } else {
-      axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations',
-      {
-        "operation": type,
-        "arguments": parameters
+    axiosRetry(axios, { 
+      retries: 3, 
+      retryDelay: () => {
+        return 10000;
       },
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      },
-      ).then((response) => {
-        console.log(response);
-        setResult(response.data.payload.result)
-      }).catch((e) => {
-        setOpenAlert(true);
-        console.log(e);
-      });
-    }
+      retryCondition:(error) => {
+        console.log('ERROR: error:', error)
+        return (error?.code === 'ERR_NETWORK')
+      }
+    });
+    
+    axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/operations',
+    {
+      "operation": type,
+      "arguments": parameters
+    },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+    ).then((response) => {
+      console.log(response);
+      setResult(response.data.payload.result)
+    }).catch((e) => {
+      // setOpenAlert(true);
+      console.log(e.response.status);
+      if(e.response.status === 401){
+        logout();
+      }
+    });
   }
 
   return (
