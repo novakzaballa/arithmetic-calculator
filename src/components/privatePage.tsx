@@ -1,9 +1,9 @@
-import {  Navigate, useOutlet } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { Bar } from "./Bar";
+import {Navigate, useOutlet} from 'react-router-dom';
+import {useAuth} from '../hooks/useAuth';
+import {Bar} from './Bar';
 
 export const PrivatePage = () => {
-  const { token } = useAuth();
+  const {token} = useAuth();
   const outlet = useOutlet();
 
   if (!token) {
@@ -14,8 +14,8 @@ export const PrivatePage = () => {
     <div>
       <Bar
         pages={[
-          { label: "Operations", path: "operations" },
-          { label: "Records", path: "records" }
+          {label: 'Operations', path: 'operations'},
+          {label: 'Records', path: 'records'},
         ]}
       />
       {outlet}

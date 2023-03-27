@@ -1,37 +1,41 @@
-import { createContext, useContext, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "./useLocalStorage";
-import axios from "axios";
+import {createContext, useContext, useMemo} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useLocalStorage} from './useLocalStorage';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useLocalStorage("token", null);
+export const AuthProvider = ({children}) => {
+  const [token, setToken] = useLocalStorage('token', null);
   const navigate = useNavigate();
 
   const login = async (data) => {
-    axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/auth',{
-      "username": data.username,
-      "password": data.password
-    })
-    .then(function (response) {
-      setToken(response.data.payload.token);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    axios
+      .post(
+        'https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/auth',
+        {
+          username: data.username,
+          password: data.password,
+        }
+      )
+      .then(function (response) {
+        setToken(response.data.payload.token);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   const logout = () => {
     setToken(null);
-    navigate("/", { replace: true });
+    navigate('/', {replace: true});
   };
 
   const value = useMemo(
     () => ({
       token,
       login,
-      logout
+      logout,
     }),
     [token]
   );
