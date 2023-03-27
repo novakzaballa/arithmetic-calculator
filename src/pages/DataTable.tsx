@@ -42,14 +42,6 @@ interface HeadCell {
   sort: boolean;
 }
 
-// interface sortBy {
-//   operation_id: string;
-//   page_number: number;
-//   rows_per_page: number;
-//   sort_by: string;
-//   sort_type: string;
-// }
-
 const headCells: readonly HeadCell[] = [
   {
     id: 'date',
@@ -221,7 +213,6 @@ export default function DataTable() {
       params
     },
     ).then((response) => {
-      console.log(response);
       setRecordRows(response.data.payload.result)
       setTotalRecord(response.data.payload.count)
 
@@ -235,13 +226,18 @@ export default function DataTable() {
 
   useEffect(() => {
     sortBy({page_number: 1, rows_per_page : 10})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { token, logout } = useAuth();
 
-  const handleFilterValue = (opetration_id: string) => {
-    setFilterValue(opetration_id)
-    sortBy({page_number: 1, rows_per_page : rowsPerPage, operation_id: opetration_id})
+  const handleFilterValue = (operation_id: string) => {
+    setFilterValue(operation_id)
+    if(operation_id){    
+      sortBy({page_number: 1, rows_per_page : rowsPerPage, operation_id: operation_id})
+    } else {
+      sortBy({page_number: 1, rows_per_page : 10})
+    }
   }
 
 
@@ -251,10 +247,8 @@ export default function DataTable() {
       headers: { Authorization: `Bearer ${token}` },
     },
     ).then((response) => {
-      console.log(response);
       sortBy({page_number: 1, rows_per_page : 10})
     }).catch((e) => {
-      console.log(e.response.status);
       if(e.response.status === 401){
         logout();
       }
@@ -262,7 +256,6 @@ export default function DataTable() {
 
   };
   const handleSwitch = (showDeleted: boolean) => {
-    console.log('DEBUG: show', showDeleted);
     sortBy({page_number: 1 , rows_per_page: rowsPerPage, sort_type: order,  show_deleted: showDeleted})
     setShowDeleted(showDeleted)
   };

@@ -20,10 +20,10 @@ import axiosRetry from 'axios-retry';
 const theme = createTheme();
 
 interface EnhancedTableToolbarProps {
-  remainingMoney: number;
+  remainingBalance: number;
 }
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { remainingMoney } = props;
+  const { remainingBalance } = props;
 
   return (
     <Toolbar
@@ -39,13 +39,17 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         }),
       }}
     >
+    
       <Typography
-        sx={{ flex: '1 1 100%' }}
+        sx={{ color: '#1976d2', justifyContent: 'flex-end' }}
         variant="h6"
         id="tableTitle"
         component="div"
       >
-        Balance: {remainingMoney}
+        Balance:  
+      </Typography>
+      <Typography variant="h6">
+        {remainingBalance}
       </Typography>
     </Toolbar>
   );
@@ -56,7 +60,7 @@ export default function Operations() {
 
   const [oneItem, setOneItem] = useState(false);
   const [type, setType] = useState('');
-  const [remainingMoney, setRemainingMoney] = useState(90);
+  const [remainingBalance, setRemainingBalance] = useState(0);
   const [buttonDisabled, setButtonDisabled]  = useState(true);
   const [operand1, setOperand1] = useState(NaN);
   const [operand2, setOperand2] = useState(NaN);
@@ -66,12 +70,36 @@ export default function Operations() {
   useEffect(() => {
     if(operand1 && operand2 && type){
       setButtonDisabled(false)
-    } else if (operand1 && (type === 'square_root')) {
+    } else if (operand1 && (type === 'square_root' || type === 'random_string')) {
       setButtonDisabled(false)
     } else {
       setButtonDisabled(true)
     }
   }, [operand1, operand2, type]);
+
+  useEffect(() => {
+    axiosRetry(axios, { 
+      retries: 3, 
+      retryDelay: () => {
+        return 10000;
+      },
+      retryCondition:(error) => {
+        return (error?.code === 'ERR_NETWORK')
+      }
+    });
+    
+    axios.get('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/users/current_user/balance',
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+    ).then((response) => {
+      setRemainingBalance(response.data.payload.result)
+    }).catch((e) => {
+      if(e.response.status === 401){
+        logout();
+      }
+    });
+  }, [logout, token]);
 
   const setTypeAndOneItem = (type: string, oneItem: boolean) => {
     setType(type);
@@ -99,13 +127,13 @@ export default function Operations() {
       headers: { Authorization: `Bearer ${token}` },
     },
     ).then((response) => {
-      console.log(response);
       setResult(response.data.payload.result)
+      setRemainingBalance(response.data.payload.user_balance)
     }).catch((e) => {
-      // setOpenAlert(true);
-      console.log(e.response.status);
       if(e.response.status === 401){
         logout();
+      } else if(e.response.status === 503){
+        setOpenAlert(true);
       }
     });
   }
@@ -113,7 +141,7 @@ export default function Operations() {
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ width: '100%' }}>
-      <EnhancedTableToolbar remainingMoney={remainingMoney}/>
+      <EnhancedTableToolbar remainingBalance={remainingBalance}/>
         <Container component="main" maxWidth="sm">
           <CssBaseline />
           <Box
@@ -195,7 +223,7 @@ export default function Operations() {
                 type="number"
                 required
                 fullWidth
-                label="number 1"
+                label={type === 'random_string' ? "Lenght" : "Number 1"}
                 name="operand1"
                 autoComplete="operand1"
                 autoFocus
@@ -210,7 +238,7 @@ export default function Operations() {
                   type="number"
                   required
                   fullWidth
-                  label="number 2"
+                  label="Number 2"
                   name="operand2"
                   autoComplete="operand2"
                   value={operand2}

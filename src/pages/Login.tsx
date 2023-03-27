@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -15,24 +15,24 @@ export default function LogIn() {
   const { login, token } = useAuth();
   const [mail, setMail]  = useState('');
   const [password, setPassword]  = useState('');
-  const [buttonDisabled, setButtonDisabled]  = useState(true);
+  // const [buttonDisabled, setButtonDisabled]  = useState(true);
 
-  useEffect(() => {
-    const validate = validateMail(mail);
-    if(validate && password){
-      setButtonDisabled(false)
-    } else {
-      setButtonDisabled(true)
-    }
-  }, [mail, password]);
+  // useEffect(() => {
+  //   const validate = validateMail(mail);
+  //   if(validate && password){
+  //     setButtonDisabled(false)
+  //   } else {
+  //     setButtonDisabled(true)
+  //   }
+  // }, [mail, password]);
 
-  const validateMail = (mail: string) => {
-    return String(mail)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  };
+  // const validateMail = (mail: string) => {
+  //   return String(mail)
+  //     .toLowerCase()
+  //     .match(
+  //       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  //     );
+  // };
 
   if (token) {
     return <Navigate to="/calculator/operations" />;

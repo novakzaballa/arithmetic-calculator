@@ -5,17 +5,16 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }: any) => {
+export const AuthProvider = ({ children }) => {
   const [token, setToken] = useLocalStorage("token", null);
   const navigate = useNavigate();
 
-  const login = async (data: any) => {
+  const login = async (data) => {
     axios.post('https://68i17san2e.execute-api.us-east-1.amazonaws.com/dev/api/v1/auth',{
       "username": data.username,
       "password": data.password
     })
     .then(function (response) {
-      console.log('DEBUG: response', response);
       setToken(response.data.payload.token);
     })
     .catch(function (error) {

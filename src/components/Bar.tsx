@@ -38,7 +38,7 @@ export const Bar = ({ pages }: any) => {
             component="div"
             sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
           >
-            Aritmetic Calculator App
+            Arithmetic Calculator App
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -91,7 +91,7 @@ export const Bar = ({ pages }: any) => {
             component="div"
             sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}
           >
-            Aritmetic Calculator App
+            Arithmetic Calculator App
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages?.map((page: any) => (
