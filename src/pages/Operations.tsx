@@ -47,7 +47,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       >
         Balance:
       </Typography>
-      <Typography variant="h6">{remainingBalance}</Typography>
+      <Typography variant="h6" id='remainingBalance'>{remainingBalance}</Typography>
     </Toolbar>
   );
 }
@@ -169,6 +169,7 @@ export default function Operations() {
                   <Button
                     fullWidth
                     variant="contained"
+                    name="addition"
                     onClick={() => {
                       setTypeAndOneItem('addition', false);
                     }}
@@ -181,6 +182,7 @@ export default function Operations() {
                   <Button
                     fullWidth
                     variant="contained"
+                    name="subtraction"
                     onClick={() => {
                       setTypeAndOneItem('subtraction', false);
                     }}
@@ -195,6 +197,7 @@ export default function Operations() {
                   <Button
                     fullWidth
                     variant="contained"
+                    name="multiplication"
                     onClick={() => {
                       setTypeAndOneItem('multiplication', false);
                     }}
@@ -210,6 +213,7 @@ export default function Operations() {
                   <Button
                     fullWidth
                     variant="contained"
+                    name="division"
                     onClick={() => {
                       setTypeAndOneItem('division', false);
                     }}
@@ -222,6 +226,7 @@ export default function Operations() {
                   <Button
                     fullWidth
                     variant="contained"
+                    name="random_string"
                     onClick={() => {
                       setTypeAndOneItem('random_string', true);
                     }}
@@ -237,6 +242,7 @@ export default function Operations() {
                   <Button
                     fullWidth
                     variant="contained"
+                    name="square_root"
                     onClick={() => {
                       setTypeAndOneItem('square_root', true);
                     }}
@@ -301,6 +307,7 @@ export default function Operations() {
                 fullWidth
                 variant="contained"
                 disabled={buttonDisabled}
+                name="result"
                 onClick={() => {
                   type === 'square_root'
                     ? calculateResult(type, {operand1})
@@ -316,6 +323,7 @@ export default function Operations() {
                   fullWidth
                   disabled
                   label="Result"
+                  name="resultField"
                   value={result}
                   sx={{mt: 2}}
                 />

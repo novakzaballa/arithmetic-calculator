@@ -97,6 +97,7 @@ export const Bar = ({pages}: any) => {
             {pages?.map((page: any) => (
               <Button
                 key={page.label}
+                name={page.label}
                 onClick={() => handleCloseNavMenu(page.path)}
                 sx={{my: 2, color: 'white', display: 'block'}}
               >
@@ -107,6 +108,7 @@ export const Bar = ({pages}: any) => {
               <Button
                 key={'logout'}
                 onClick={logout}
+                id='logout'
                 sx={{my: 2, color: 'white', display: 'block'}}
               >
                 {'logout'}

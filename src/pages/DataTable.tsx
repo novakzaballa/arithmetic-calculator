@@ -105,6 +105,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             {headCell.sort ? (
               <TableSortLabel
                 active={orderBy === headCell.id}
+                id={headCell.id}
                 direction={order}
                 onClick={() => setOrderHandler(order, headCell.id)}
               >
@@ -168,7 +169,10 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         value="show"
         control={
           <Switch
+            name='showDeleted'
+            id='showDeleted'
             color="primary"
+            defaultChecked
             onChange={(event) => handleSwitch(event.target.checked)}
           />
         }
@@ -187,12 +191,12 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           <MenuItem value={''}>
             <em>None</em>
           </MenuItem>
-          <MenuItem value={'OPERATION#addition'}>Addition</MenuItem>
-          <MenuItem value={'OPERATION#subtraction'}>Subtraction</MenuItem>
-          <MenuItem value={'OPERATION#multiplication'}>Multiplication</MenuItem>
-          <MenuItem value={'OPERATION#division'}>Division</MenuItem>
-          <MenuItem value={'OPERATION#square_root'}>Square Root</MenuItem>
-          <MenuItem value={'OPERATION#random_string'}>
+          <MenuItem value={'OPERATION#addition'} id='addition'>Addition</MenuItem>
+          <MenuItem value={'OPERATION#subtraction'} id='subtraction'>Subtraction</MenuItem>
+          <MenuItem value={'OPERATION#multiplication'} id='multiplication'>Multiplication</MenuItem>
+          <MenuItem value={'OPERATION#division'} id='division'>Division</MenuItem>
+          <MenuItem value={'OPERATION#square_root'} id='square_root'>Square Root</MenuItem>
+          <MenuItem value={'OPERATION#random_string'} id='random_stringdition'>
             Random string generation
           </MenuItem>
         </Select>
@@ -209,7 +213,7 @@ export default function DataTable() {
   const [filterValue, setFilterValue] = React.useState('');
   const [recordRows, setRecordRows] = React.useState([]);
   const [totalRecord, setTotalRecord] = React.useState(0);
-  const [showDeleted, setShowDeleted] = React.useState(false);
+  const [showDeleted, setShowDeleted] = React.useState(true);
 
   const sortBy = (params: any) => {
     axios
@@ -322,74 +326,43 @@ export default function DataTable() {
               {recordRows.map((row: Data, index: number) => {
                 const labelId = `enhanced-table-checkbox-${index}`;
                 return (
-                  <>
-                    {row.deleted === true && showDeleted ? (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={row.id}
-                        sx={{
-                          ...(row.deleted === true && {
-                            opacity: 0.4,
-                          }),
-                        }}
-                      >
-                        <TableCell align="left">{row.date}</TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          padding="none"
+                  <TableRow
+                  hover
+                  role="checkbox"
+                  tabIndex={-1}
+                  key={row.id}
+                  sx={{
+                    ...(row.deleted === true && {
+                      opacity: 0.4,
+                    }),
+                  }}
+                >
+                    <TableCell align="left">{row.date}</TableCell>
+                    <TableCell
+                      component="th"
+                      id={labelId}
+                      scope="row"
+                      padding="none"
+                    >
+                      {row.operation_id.substring(10)}
+                    </TableCell>
+                    <TableCell align="right">{row.user_balance}</TableCell>
+                    <TableCell align="right">
+                      {row.operation_response}
+                    </TableCell>
+                    <TableCell align="right">
+                      {row.deleted === true ? (
+                        <Typography>{'Deleted'}</Typography>
+                      ) : (
+                        <Button
+                          onClick={() => deleteRecord(row.id.toString())}
                         >
-                          {row.operation_id.substring(10)}
-                        </TableCell>
-                        <TableCell align="right">{row.user_balance}</TableCell>
-                        <TableCell align="right">
-                          {row.operation_response}
-                        </TableCell>
-                        <TableCell align="right">{'Deleted'}</TableCell>
-                      </TableRow>
-                    ) : (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={row.id}
-                        sx={{
-                          ...(row.deleted === true && {
-                            opacity: 0.4,
-                          }),
-                        }}
-                      >
-                        <TableCell align="left">{row.date}</TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          padding="none"
-                        >
-                          {row.operation_id.substring(10)}
-                        </TableCell>
-                        <TableCell align="right">{row.user_balance}</TableCell>
-                        <TableCell align="right">
-                          {row.operation_response}
-                        </TableCell>
-                        <TableCell align="right">
-                          {row.deleted === true ? (
-                            <Typography>{'Deleted'}</Typography>
-                          ) : (
-                            <Button
-                              onClick={() => deleteRecord(row.id.toString())}
-                            >
-                              {' '}
-                              <DeleteIcon sx={{color: 'red'}} />{' '}
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </>
+                          {' '}
+                          <DeleteIcon sx={{color: 'red'}} />{' '}
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
                 );
               })}
             </TableBody>
@@ -398,6 +371,7 @@ export default function DataTable() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
+          id='paginator'
           count={totalRecord}
           rowsPerPage={rowsPerPage}
           page={page}
