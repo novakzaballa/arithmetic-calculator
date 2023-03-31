@@ -1,21 +1,21 @@
-import * as React from "react";
-import MuiAppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import * as React from 'react';
+import MuiAppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
+import {useNavigate} from 'react-router-dom';
+import {useAuth} from '../hooks/useAuth';
 
-export const Bar = ({ pages }: any) => {
+export const Bar = ({pages}: any) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const navigate = useNavigate();
-  const { token, logout } = useAuth();
+  const {token, logout} = useAuth();
 
   const handleOpenNavMenu = (event: any) => {
     setAnchorElNav(event.currentTarget);
@@ -36,12 +36,12 @@ export const Bar = ({ pages }: any) => {
             variant="h6"
             noWrap
             component="div"
-            sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
+            sx={{mr: 2, display: {xs: 'none', md: 'flex'}}}
           >
-            Aritmetic Calculator App
+            Arithmetic Calculator App
           </Typography>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+          <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -56,18 +56,18 @@ export const Bar = ({ pages }: any) => {
               id="menu-appbar"
               anchorEl={anchorElNav}
               anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left"
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
               keepMounted
               transformOrigin={{
-                vertical: "top",
-                horizontal: "left"
+                vertical: 'top',
+                horizontal: 'left',
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{
-                display: { xs: "block", md: "none" }
+                display: {xs: 'block', md: 'none'},
               }}
             >
               {pages?.map((page: any) => (
@@ -79,7 +79,7 @@ export const Bar = ({ pages }: any) => {
                 </MenuItem>
               ))}
               {!!token && (
-                <MenuItem key={"logout"} onClick={logout}>
+                <MenuItem key={'logout'} onClick={logout}>
                   <Typography textAlign="center">Logout</Typography>
                 </MenuItem>
               )}
@@ -89,27 +89,29 @@ export const Bar = ({ pages }: any) => {
             variant="h6"
             noWrap
             component="div"
-            sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}
+            sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}
           >
-            Aritmetic Calculator App
+            Arithmetic Calculator App
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+          <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
             {pages?.map((page: any) => (
               <Button
                 key={page.label}
+                name={page.label}
                 onClick={() => handleCloseNavMenu(page.path)}
-                sx={{ my: 2, color: "white", display: "block" }}
+                sx={{my: 2, color: 'white', display: 'block'}}
               >
                 {page.label}
               </Button>
             ))}
             {!!token && (
               <Button
-                key={"logout"}
+                key={'logout'}
                 onClick={logout}
-                sx={{ my: 2, color: "white", display: "block" }}
+                id='logout'
+                sx={{my: 2, color: 'white', display: 'block'}}
               >
-                {"logout"}
+                {'logout'}
               </Button>
             )}
           </Box>

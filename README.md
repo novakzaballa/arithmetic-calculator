@@ -9,7 +9,7 @@ To use this app, you will need to have Node.js and NPM installed on your compute
 Installing:
 Clone the repository to your local machine using the following command:
 
-### `git clone https://github.com/your-username/calculator-app.git`
+### `https://github.com/novakzaballa/arithmetic-calculator.git`
 
 Navigate to the project directory using the following command:
 
@@ -31,18 +31,23 @@ To build the app for production, use the following command:
 ### `npm run build`
 This will create a production-ready build of the app in the build directory.
 
+## Login Credentials
+    - User: Novak
+    - Password: password123
+
 ## Features
 This calculator app has the following features:
 
-Addition
-Subtraction
-Multiplication
-Division
-Square Root
-Random string generation
+    - Addition
+    - Subtraction
+    - Multiplication
+    - Division
+    - Square Root
+    - Random string generation
+    - Records
 
 ## Built With
-React
-TypeScript
-MUI
-NPM
+    - React
+    - TypeScript
+    - MUI
+    - NPM
