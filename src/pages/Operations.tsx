@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {alpha} from '@mui/material/styles';
+import { useFlags, useFlagsmith } from 'flagsmith/react';
 import {useAuth} from '../hooks/useAuth';
 import axiosRetry from 'axios-retry';
 
@@ -63,6 +64,34 @@ export default function Operations() {
   const [operand2, setOperand2] = useState(NaN);
   const [openAlert, setOpenAlert] = useState(false);
   const [result, setResult] = useState(NaN);
+
+  const flags = useFlags(['operation_rnd']);
+
+  // const flagsmith = useFlagsmith();
+  // flagsmith.init({
+  //   environmentID: 'WYBZSCbJrGkApn9EqGZxEa',
+  //   api:"http://localhost:8000/api/v1/",
+  //   // cacheFlags: true, // stores flags in localStorage cache
+  //   onChange: (oldFlags, params) => {
+  //    //Occurs whenever flags are changed
+  //    const { isFromServer } = params; //determines if the update came from the server or local cached storage
+  //    console.log('DEBUG: isFromServer:', isFromServer)
+
+  //    //Check for a feature
+  //    if (flagsmith.hasFeature('operation_rnd')) {
+  //       console.log('DEBUG: hasFeature:')
+  //    }
+
+  //    //Or, use the value of a feature
+  //    const flagValue2 = flagsmith.getValue('operation_rnd')
+  //    console.log('DEBUG: flagValue2:', flagValue2)
+  //   },
+  //  });
+
+  // console.log('DEBUG: flags:', flags)
+
+  const random_number_operation = flags.operation_rnd.enabled
+  console.log('DEBUG: random_number_operation:', random_number_operation)
 
   useEffect(() => {
     if (operand1 && operand2 && type) {
@@ -222,6 +251,7 @@ export default function Operations() {
                     /
                   </Button>
                 </Grid>
+                {random_number_operation && 
                 <Grid item xs={3}>
                   <Button
                     fullWidth
@@ -237,7 +267,7 @@ export default function Operations() {
                   >
                     RND
                   </Button>
-                </Grid>
+                </Grid>}
                 <Grid item xs={3}>
                   <Button
                     fullWidth

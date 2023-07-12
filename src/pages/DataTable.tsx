@@ -23,6 +23,7 @@ import InputLabel from '@mui/material/InputLabel';
 import axios from 'axios';
 import {useAuth} from '../hooks/useAuth';
 import {Button} from '@mui/material';
+// import { useFlags, useFlagsmith } from 'flagsmith/react';
 
 interface Data {
   id: number;
@@ -80,6 +81,8 @@ interface EnhancedTableProps {
 
 function EnhancedTableHead(props: EnhancedTableProps) {
   const {order, orderBy, rowsPerPage, setOrder, sortBy, setOrderBy} = props;
+  // const flags = useFlags(['operation_rnd']);
+  // console.log('DEBUG: flags:', flags)
 
   const setOrderHandler = (order: string, operationId: string) => {
     const or = order === 'asc' ? 'desc' : 'asc';
